@@ -1,0 +1,1 @@
+D:\Projects\Posts\build\classes\kotlin\main\MainKt.class;D:\Projects\Posts\build\classes\kotlin\main\Post$comment.class;D:\Projects\Posts\build\classes\kotlin\main\Post$likes.class;D:\Projects\Posts\build\classes\kotlin\main\Post.class;D:\Projects\Posts\build\classes\kotlin\main\WallService.class
