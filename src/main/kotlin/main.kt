@@ -51,11 +51,11 @@ object WallService {
 
     fun update(id: Int): Boolean {
         val updateId = id
-        var result: Boolean
+        var result = false
         for (post in allPosts) if (post.id === updateId) {
             post.text = "post updated"
            result = true
-        } else { result = false}
+        }
        return result
     }
 

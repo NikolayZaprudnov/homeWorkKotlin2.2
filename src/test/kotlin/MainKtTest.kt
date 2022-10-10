@@ -19,7 +19,7 @@ class MainKtTest {
 
     @Test
     fun updateTrue() {
-        val id = 0
+        val id = 1
         assertTrue(WallService.update(id))
     }
     @Test
