@@ -1,30 +1,48 @@
 @file:Suppress("DEPRECATED_IDENTITY_EQUALS")
 
+import java.time.Duration
 import java.time.Instant
 import java.util.*
+import kotlin.concurrent.timer
 
 fun main() {
     val post = Post(
         0, authorId = 0, "Первый пост на сегодня", Post.comment(
             0,
             "Нет комментариев"
-        ), Post.likes(0, true), time = Instant.now()
+        ), Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.addLikes(post)
     WallService.addComment(post)
     WallService.add(post)
     println(post)
     val post2 = Post(
-        0, 1, "New post", Post.comment(0, "no"),
-        Post.likes(0, true), Instant.now()
+        0,
+        1,
+        "New post",
+        Post.comment(0, "no"),
+        Post.likes(0, true),
+        arrayOf(
+            Post.ImageAttachment(
+                Post.Image(
+                    12,
+                    "Stich",
+                    "https://avatarko.ru/img/kartinka/33/multfilm_lyagushka_32117.jpg",
+                    "Стич с лягушкой"
+                )
+            )
+        ),
+        time = Instant.now(),
+        null
     )
     WallService.add(post2)
     val post3 = Post(
         0, 1, "New post2", Post.comment(0, "no"),
-        Post.likes(0, true), Instant.now()
+        Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.add(post3)
     WallService.update(1)
+    WallService.add(WallService.repost(post2))
     println(Arrays.toString(WallService.allPosts))
 
 }
@@ -35,10 +53,25 @@ data class Post(
     var text: String,
     val Comment: comment,
     val Likes: likes,
+    val attachment: Array<Attachment>?,
     val time: Instant,
-) {
+    val original: Post?,
+
+    ) {
     data class comment(var authorCommentsId: Int, var textComment: String)
     data class likes(var likesAmount: Int = 0, var canLikes: Boolean = true)
+    open class Attachment(type: String)
+    class Video(val id: Int, val name: String, val duration: Duration, val title: String)
+    class VideoAttachment(val video: Video) : Attachment("video")
+    class Audio(val id: Int, val name: String, val duration: Duration, val title: String)
+    class AudioAttachment(val audio: Audio) : Attachment("audio")
+    class Image(val id: Int, val name: String, val URL: String, val title: String)
+    class ImageAttachment(val image: Image) : Attachment("image")
+    class File(val id: Int, val name: String, val formate: String, val title: String)
+    class FileAttachment(val file: File) : Attachment("file")
+    class Sticker(val id: Int, val imageURL: String)
+    class StickerAttachment(val sticker: Sticker) : Attachment("sticker")
+
 }
 
 object WallService {
@@ -54,9 +87,9 @@ object WallService {
         var result = false
         for (post in allPosts) if (post.id === updateId) {
             post.text = "post updated"
-           result = true
+            result = true
         }
-       return result
+        return result
     }
 
     fun addComment(post: Post) {
@@ -70,5 +103,19 @@ object WallService {
             post.Likes.canLikes = false
         } else {
         }
+    }
+
+    fun repost(post: Post): Post {
+        if (post.original === null) {
+            return post.copy(
+                post.id,
+                post.authorId,
+                post.text,
+                post.Comment,
+                Post.likes(0, true),
+                time = Instant.now(),
+                original = post
+            )
+        } else return post
     }
 }

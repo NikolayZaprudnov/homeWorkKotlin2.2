@@ -11,7 +11,7 @@ class MainKtTest {
             0, authorId = 0, "Первый пост на сегодня", Post.comment(
                 0,
                 "Нет комментариев"
-            ), Post.likes(0, true), time = Instant.now()
+            ), Post.likes(0, true), null, time = Instant.now(), null
         )
         val result = WallService.add(post).id
         assertEquals(1, result)
