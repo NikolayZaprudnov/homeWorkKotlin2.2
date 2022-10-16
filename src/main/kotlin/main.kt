@@ -7,20 +7,17 @@ import kotlin.concurrent.timer
 
 fun main() {
     val post = Post(
-        0, authorId = 0, "Первый пост на сегодня", Post.comment(
-            0,
-            "Нет комментариев"
-        ), Post.likes(0, true), null, time = Instant.now(), null
+        0, authorId = 0, "Первый пост на сегодня", null, Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.addLikes(post)
-    WallService.addComment(post)
     WallService.add(post)
+    WallService.addComment(1, Post.comment(15 , "Новый комментарий"))
     println(post)
     val post2 = Post(
         0,
         1,
         "New post",
-        Post.comment(0, "no"),
+        null,
         Post.likes(0, true),
         arrayOf(
             Post.ImageAttachment(
@@ -37,12 +34,13 @@ fun main() {
     )
     WallService.add(post2)
     val post3 = Post(
-        0, 1, "New post2", Post.comment(0, "no"),
+        0, 1, "New post2", null,
         Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.add(post3)
     WallService.update(1)
     WallService.add(WallService.repost(post2))
+    WallService.addComment(2, Post.comment(15, "Новый комментарий"))
     println(Arrays.toString(WallService.allPosts))
 
 }
@@ -51,7 +49,7 @@ data class Post(
     var id: Int,
     val authorId: Int,
     var text: String,
-    val Comment: comment,
+    var Comment: Array<comment>?,
     val Likes: likes,
     val attachment: Array<Attachment>?,
     val time: Instant,
@@ -92,9 +90,8 @@ object WallService {
         return result
     }
 
-    fun addComment(post: Post) {
-        post.Comment.authorCommentsId += 1
-        post.Comment.textComment = "Comment"
+    fun addComment(id: Int, newComment: Post.comment) {
+        findById(id)?.Comment?.plus(newComment)
     }
 
     fun addLikes(post: Post) {
@@ -103,6 +100,18 @@ object WallService {
             post.Likes.canLikes = false
         } else {
         }
+    }
+    fun findById(id: Int): Post?{
+        var result = false
+        for (post in allPosts){
+            if(post.id === id){
+                result = true
+                return post
+            }
+        }
+        if (result===false){ throw PostNotFoundException("Не найден пост с номером ID $id")}
+        return null
+
     }
 
     fun repost(post: Post): Post {
@@ -119,3 +128,4 @@ object WallService {
         } else return post
     }
 }
+ class PostNotFoundException (message: String): RuntimeException(message)
