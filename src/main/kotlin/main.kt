@@ -7,17 +7,17 @@ import kotlin.concurrent.timer
 
 fun main() {
     val post = Post(
-        0, authorId = 0, "Первый пост на сегодня", null, Post.likes(0, true), null, time = Instant.now(), null
+        0, authorId = 0, "Первый пост на сегодня", emptyArray(), Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.addLikes(post)
     WallService.add(post)
-    WallService.addComment(1, Post.comment(15 , "Новый комментарий"))
+    WallService.addComment(1, Post.comment(15 , "Новый комментарий0"))
     println(post)
     val post2 = Post(
         0,
         1,
         "New post",
-        null,
+        emptyArray(),
         Post.likes(0, true),
         arrayOf(
             Post.ImageAttachment(
@@ -34,13 +34,14 @@ fun main() {
     )
     WallService.add(post2)
     val post3 = Post(
-        0, 1, "New post2", null,
+        0, 1, "New post2", emptyArray(),
         Post.likes(0, true), null, time = Instant.now(), null
     )
     WallService.add(post3)
     WallService.update(1)
     WallService.add(WallService.repost(post2))
     WallService.addComment(2, Post.comment(15, "Новый комментарий"))
+    WallService.addComment(2, Post.comment(15, "Новый комментарий 2"))
     println(Arrays.toString(WallService.allPosts))
 
 }
@@ -49,7 +50,7 @@ data class Post(
     var id: Int,
     val authorId: Int,
     var text: String,
-    var Comment: Array<comment>?,
+    var Comment: Array<comment> = emptyArray(),
     val Likes: likes,
     val attachment: Array<Attachment>?,
     val time: Instant,
@@ -91,7 +92,7 @@ object WallService {
     }
 
     fun addComment(id: Int, newComment: Post.comment) {
-        findById(id)?.Comment?.plus(newComment)
+        findById(id)?.Comment = findById(id)?.Comment!! + newComment
     }
 
     fun addLikes(post: Post) {
